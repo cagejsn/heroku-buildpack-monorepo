@@ -53,7 +53,7 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
 
     for OTHER_REQUIRED_DIRECTORY in $( echo -n "$OTHER_REQUIRED_DIRECTORIES" | tr ',' ' ' ); do
 
-        NEW_DIR="$(echo $RANDOM | sha1 | cut -c1-6 )" 
+        NEW_DIR="$(echo $RANDOM | sha1sum | cut -c1-6 )" 
         mkdir -p "${BUILD_DIR}/${NEW_DIR}"
 
         mv "$STAGE/$(basename $OTHER_REQUIRED_DIRECTORY)/*" "${BUILD_DIR}/${NEW_DIR}"
