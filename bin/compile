@@ -18,16 +18,60 @@ if [ ! -f "${ENV_DIR}/APP_BASE" ]; then
 fi
 APP_BASE="$(cat "${ENV_DIR}/APP_BASE")"
 
-(
-    mv "${BUILD_DIR}/${APP_BASE}" "${STAGE}" &&
-    rm -rf "${BUILD_DIR}"/* &&
-    mv "${STAGE}/$(basename "$APP_BASE")"/* "${BUILD_DIR}"
-)
 
-if [ $? -ne 0 ]; then
-    echo "FAILED to copy directory into place" | indent
-    exit 1
+if [ -f "${ENV_DIR}/OTHER_REQUIRED_DIRECTORIES" ]; then
+    OTHER_REQUIRED_DIRECTORIES="$(cat "${ENV_DIR}/OTHER_REQUIRED_DIRECTORIES")"
 fi
 
-echo "Copied ${APP_BASE} to root of app successfully" | indent
+if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
+
+    echo "will attempt to move '${APP_BASE}' and '${OTHER_REQUIRED_DIRECTORIES}' to root of app" | indent
+
+    for OTHER_REQUIRED_DIRECTORY in $( echo -n "$OTHER_REQUIRED_DIRECTORIES" | tr ',' ' ' ); do
+
+        echo "moving: $OTHER_REQUIRED_DIRECTORY" | indent
+
+        (
+            mv "${BUILD_DIR}/${OTHER_REQUIRED_DIRECTORY}" "${STAGE}" &&
+            NEW_PATH=$(realpath "${STAGE}/$(basename "$OTHER_REQUIRED_DIRECTORY")")
+            ln -s "$NEW_PATH" "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"
+        )
+
+        if [ $? -ne 0 ]; then
+        echo "FAILED to copy "$OTHER_REQUIRED_DIRECTORY" into place" | indent
+        exit 1
+        fi
+
+    done
+
+    (
+        mv "${BUILD_DIR}/${APP_BASE}" "${STAGE}" &&
+        rm -rf "${BUILD_DIR}"/* &&
+        mv "${STAGE}/$(basename "$APP_BASE")"/* "${BUILD_DIR}"
+    )
+
+    if [ $? -ne 0 ]; then
+        echo "FAILED to copy ${APP_BASE} into place" | indent
+        exit 1
+    fi
+
+    echo "Copied ${APP_BASE} and ${OTHER_REQUIRED_DIRECTORIES} to root of app successfully" | indent
+
+else 
+
+    (
+        mv "${BUILD_DIR}/${APP_BASE}" "${STAGE}" &&
+        rm -rf "${BUILD_DIR}"/* &&
+        mv "${STAGE}/$(basename "$APP_BASE")"/* "${BUILD_DIR}"
+    )
+
+    if [ $? -ne 0 ]; then
+        echo "FAILED to copy ${APP_BASE} into place" | indent
+        exit 1
+    fi
+
+    echo "Copied ${APP_BASE} to root of app successfully" | indent
+
+fi
+
 
