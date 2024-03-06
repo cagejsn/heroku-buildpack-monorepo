@@ -58,7 +58,7 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
 
         mv "$STAGE/$(basename $OTHER_REQUIRED_DIRECTORY)"/* "${BUILD_DIR}/${NEW_DIR}"
 
-        sed -i '' "s|file:\.\./${OTHER_REQUIRED_DIRECTORY}|file:${NEW_DIR}|g" "${BUILD_DIR}/package.json" "${BUILD_DIR}/package-lock.json"
+        sed "s|file:\.\./${OTHER_REQUIRED_DIRECTORY}|file:${NEW_DIR}|g" "${BUILD_DIR}/package.json" "${BUILD_DIR}/package-lock.json"
 
     done
 
