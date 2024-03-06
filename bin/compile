@@ -19,21 +19,21 @@ fi
 APP_BASE="$(cat "${ENV_DIR}/APP_BASE")"
 
 
-if [ -f "${ENV_DIR}/OTHER_REQUIRED_DIRECTORIES" ]; then
-    OTHER_REQUIRED_DIRECTORIES="$(cat "${ENV_DIR}/OTHER_REQUIRED_DIRECTORIES")"
+if [ -f "${ENV_DIR}/SYMLINK_DIRECTORIES" ]; then
+    SYMLINK_DIRECTORIES="$(cat "${ENV_DIR}/SYMLINK_DIRECTORIES")"
 fi
 
-if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
+if [ -n "$SYMLINK_DIRECTORIES" ]; then
 
-    echo "will attempt to move '${APP_BASE}' and '${OTHER_REQUIRED_DIRECTORIES}' to root of app" | indent
+    echo "will attempt to move '${APP_BASE}' and '${SYMLINK_DIRECTORIES}' to root of app" | indent
 
-    for OTHER_REQUIRED_DIRECTORY in $( echo -n "$OTHER_REQUIRED_DIRECTORIES" | tr ',' ' ' ); do
+    for SYMLINK_DIRECTORY in $( echo -n "$SYMLINK_DIRECTORIES" | tr ',' ' ' ); do
 
-        echo "moving: $OTHER_REQUIRED_DIRECTORY" | indent
+        echo "moving: $SYMLINK_DIRECTORY" | indent
    
-        mv "${BUILD_DIR}/${OTHER_REQUIRED_DIRECTORY}" "${STAGE}" 
+        mv "${BUILD_DIR}/${SYMLINK_DIRECTORY}" "${STAGE}" 
         if [ $? -ne 0 ]; then
-        echo "FAILED to copy "$OTHER_REQUIRED_DIRECTORY" into place" | indent
+        echo "FAILED to copy "$SYMLINK_DIRECTORY" into place" | indent
         exit 1
         fi
 
@@ -51,26 +51,16 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
     fi
 
 
-    for OTHER_REQUIRED_DIRECTORY in $( echo -n "$OTHER_REQUIRED_DIRECTORIES" | tr ',' ' ' ); do
+    for SYMLINK_DIRECTORY in $( echo -n "$SYMLINK_DIRECTORIES" | tr ',' ' ' ); do
 
-        NEW_DIR="$(echo $RANDOM | sha1sum | cut -c1-6 )" 
-        mkdir -p "${BUILD_DIR}/${NEW_DIR}"
-
-        mv "$STAGE/$(basename $OTHER_REQUIRED_DIRECTORY)"/* "${BUILD_DIR}/${NEW_DIR}"
-
-        sed "s|\.\./${OTHER_REQUIRED_DIRECTORY}|${NEW_DIR}|g" "${BUILD_DIR}/package.json" | tee "${BUILD_DIR}/package.json.new"
-        rm "${BUILD_DIR}/package.json"
-        mv "${BUILD_DIR}/package.json.new" "${BUILD_DIR}/package.json"
-
-        sed "s|\.\./${OTHER_REQUIRED_DIRECTORY}|${NEW_DIR}|g" "${BUILD_DIR}/package-lock.json" | tee "${BUILD_DIR}/package-lock.json.new"
-        rm "${BUILD_DIR}/package-lock.json"
-        mv "${BUILD_DIR}/package-lock.json.new" "${BUILD_DIR}/package-lock.json"
-       
+        unlink "${BUILD_DIR}/${SYMLINK_DIRECTORY}"
+        mkdir -p "${BUILD_DIR}/${SYMLINK_DIRECTORY}"
+        mv "$STAGE/$(basename $SYMLINK_DIRECTORY)"/* "${BUILD_DIR}/${SYMLINK_DIRECTORY}"
 
     done
 
 
-    echo "Copied ${APP_BASE} and ${OTHER_REQUIRED_DIRECTORIES} to root of app successfully" | indent
+    echo "Copied ${APP_BASE} and ${SYMLINK_DIRECTORIES} to root of app successfully" | indent
 
 else 
 
