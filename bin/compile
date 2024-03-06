@@ -33,15 +33,15 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
 
         (
             mv "${BUILD_DIR}/${OTHER_REQUIRED_DIRECTORY}" "${STAGE}" &&
-            NEW_PATH=${STAGE}/$(basename "$OTHER_REQUIRED_DIRECTORY") &&
+            NEW_PATH="$STAGE/$(basename $OTHER_REQUIRED_DIRECTORY)" &&
             ln -s "$NEW_PATH" "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"
         )
 
-        echo "created symlink to ${NEW_PATH} from "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"" | indent
+        echo "created symlink to $NEW_PATH from $BUILD_DIR/../$(basename $OTHER_REQUIRED_DIRECTORY)" | indent
 
         echo "checking ... " | indent
         echo "ls "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"" | indent
-        $(ls "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")") | echo | indent
+        echo "$(ls $BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY"))" | indent
 
         if [ $? -ne 0 ]; then
         echo "FAILED to copy "$OTHER_REQUIRED_DIRECTORY" into place" | indent
