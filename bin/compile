@@ -58,13 +58,7 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
 
         mv "$STAGE/$(basename $OTHER_REQUIRED_DIRECTORY)"/* "${BUILD_DIR}/${NEW_DIR}"
 
-        ln -s "${BUILD_DIR}/${NEW_DIR}" "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"
-        
-        echo "created symlink to "${BUILD_DIR}/${NEW_DIR}" from $BUILD_DIR/../$(basename $OTHER_REQUIRED_DIRECTORY)" | indent
-
-        echo "checking ... " | indent
-        echo "ls "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"" | indent
-        echo "$(ls $BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY"))" | indent
+        sed -i '' "s|file:\.\./${OTHER_REQUIRED_DIRECTORY}|file:${NEW_DIR}|g" "${BUILD_DIR}/package.json" "${BUILD_DIR}/package-lock.json"
 
     done
 
