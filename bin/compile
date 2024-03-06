@@ -30,19 +30,8 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
     for OTHER_REQUIRED_DIRECTORY in $( echo -n "$OTHER_REQUIRED_DIRECTORIES" | tr ',' ' ' ); do
 
         echo "moving: $OTHER_REQUIRED_DIRECTORY" | indent
-
-        (
-            mv "${BUILD_DIR}/${OTHER_REQUIRED_DIRECTORY}" "${STAGE}" &&
-            NEW_PATH="$STAGE/$(basename $OTHER_REQUIRED_DIRECTORY)" &&
-            ln -s "$NEW_PATH" "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"
-        )
-
-        echo "created symlink to $NEW_PATH from $BUILD_DIR/../$(basename $OTHER_REQUIRED_DIRECTORY)" | indent
-
-        echo "checking ... " | indent
-        echo "ls "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"" | indent
-        echo "$(ls $BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY"))" | indent
-
+   
+        mv "${BUILD_DIR}/${OTHER_REQUIRED_DIRECTORY}" "${STAGE}" 
         if [ $? -ne 0 ]; then
         echo "FAILED to copy "$OTHER_REQUIRED_DIRECTORY" into place" | indent
         exit 1
@@ -60,6 +49,25 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
         echo "FAILED to copy ${APP_BASE} into place" | indent
         exit 1
     fi
+
+
+    for OTHER_REQUIRED_DIRECTORY in $( echo -n "$OTHER_REQUIRED_DIRECTORIES" | tr ',' ' ' ); do
+
+        NEW_DIR="$(echo $RANDOM | md5 | cut -c1-6 )" 
+        mkdir -p "${BUILD_DIR}/${NEW_DIR}"
+
+        mv "$STAGE/$(basename $OTHER_REQUIRED_DIRECTORY)/*" "${BUILD_DIR}/${NEW_DIR}"
+
+        ln -s "${BUILD_DIR}/${NEW_DIR}" "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"
+        
+        echo "created symlink to "${BUILD_DIR}/${NEW_DIR}" from $BUILD_DIR/../$(basename $OTHER_REQUIRED_DIRECTORY)" | indent
+
+        echo "checking ... " | indent
+        echo "ls "$BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY")"" | indent
+        echo "$(ls $BUILD_DIR/../$(basename "$OTHER_REQUIRED_DIRECTORY"))" | indent
+
+    done
+
 
     echo "Copied ${APP_BASE} and ${OTHER_REQUIRED_DIRECTORIES} to root of app successfully" | indent
 
