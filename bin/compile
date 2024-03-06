@@ -62,7 +62,7 @@ if [ -n "$OTHER_REQUIRED_DIRECTORIES" ]; then
         rm "${BUILD_DIR}/package.json"
         mv "${BUILD_DIR}/package.json.new" "${BUILD_DIR}/package.json"
 
-        sed "s|\.\./${OTHER_REQUIRED_DIRECTORY}|${NEW_DIR}|g" "${BUILD_DIR}/package-lock.json" | tee "${BUILD_DIR}/package-lock.json"
+        sed "s|\.\./${OTHER_REQUIRED_DIRECTORY}|${NEW_DIR}|g" "${BUILD_DIR}/package-lock.json" | tee "${BUILD_DIR}/package-lock.json.new"
         rm "${BUILD_DIR}/package-lock.json"
         mv "${BUILD_DIR}/package-lock.json.new" "${BUILD_DIR}/package-lock.json"
        
